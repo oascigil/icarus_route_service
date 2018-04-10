@@ -1,0 +1,23 @@
+# Ignore binaries, packaged files and temp files
+*.py[cod]
+__pycache__
+*~
+*.egg-info
+
+# Ignore all files starting with . (e.g. .classpath, .*project) but not .gitignore and .travis.yml
+.*
+!.gitignore
+!.travis.yml
+
+# Ignore results
+*.pickle
+
+# Ignore doc build files
+doc/build
+doc/source/apidoc
+
+# Ignore plot files
+*.pdf
+
+# Ignore patches
+*.patch

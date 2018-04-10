@@ -1,0 +1,34 @@
+# After changing this file, check it on:
+#   http://lint.travis-ci.org/
+sudo: false
+
+language: python
+
+# Python versions to be tested
+python:
+  - "2.7"
+  - "3.4"
+  - "3.5"
+  - "3.6"
+
+addons:
+  apt:
+    packages:
+    - libatlas-dev
+    - libatlas-base-dev
+    - liblapack-dev
+    - gfortran
+    - libsuitesparse-dev
+    - libgdal-dev
+    - graphviz
+    - mono-devel
+
+before_install:
+  - uname -a
+  - printenv
+
+install:
+  - travis_wait 30 make install # Building Scipy from sources on Python 2.7 takes more than 10 minutes
+
+script:
+  - make test
