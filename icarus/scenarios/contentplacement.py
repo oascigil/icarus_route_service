@@ -61,11 +61,10 @@ def uniform_content_placement(topology, contents, seed=None):
     apply_content_placement(content_placement, topology)
 
 @register_content_placement('TRANSIT_LOCAL')
-def transit_local_content_placement(topology, contents, percentage_local, percentage_edge, seed=None):
+def transit_local_content_placement(topology, contents, percentage_local=0.2, percentage_edge=0.8, seed=None):
     """
     Places a portion of content objects at the edge (i.e., border) routers and a portion of content objects at the internal routers of the ISP
     """
-
     random.seed(seed)
     n_contents = len(contents)
     n_internal_nodes = n_contents*percentage_local

@@ -84,6 +84,27 @@ class DataCollector(object):
         """
         pass
 
+    def locator_hit(self, node):
+        """Reports that the RSN cache at node *node* served the requested content.
+        
+        Parameters
+        ----------
+        node : any hashable type
+            The node whose cache served the content
+        """
+        pass
+    
+    def locator_miss(self, node):
+        """Reports that the RSN cache at node *node* has been looked up for
+        requested content but there was a cache miss.
+        
+        Parameters
+        ----------
+        node : any hashable type
+            The node whose cache served the content
+        """
+        pass
+
     def server_hit(self, node):
         """Reports that the requested content has been served by the server at
         node *node*.
@@ -164,7 +185,7 @@ class CollectorProxy(DataCollector):
     """
 
     EVENTS = ('start_session', 'end_session', 'cache_hit', 'cache_miss', 'server_hit',
-              'request_hop', 'content_hop', 'results')
+              'request_hop', 'content_hop', 'results', 'locator_hit', 'locator_miss')
 
     def __init__(self, view, collectors):
         """Constructor
@@ -194,6 +215,16 @@ class CollectorProxy(DataCollector):
     def cache_miss(self, node):
         for c in self.collectors['cache_miss']:
             c.cache_miss(node)
+
+    @inheritdoc(DataCollector)
+    def locator_hit(self, node):
+        for c in self.collectors['locator_hit']:
+            c.locator_hit(node)
+
+    @inheritdoc(DataCollector)
+    def locator_miss(self, node):
+        for c in self.collectors['locator_miss']:
+            c.locator_miss(node)
 
     @inheritdoc(DataCollector)
     def server_hit(self, node):
@@ -365,6 +396,7 @@ class CacheHitRatioCollector(DataCollector):
         self.cont_hits = content_hits
         self.sess_count = 0
         self.cache_hits = 0
+        self.locator_hits = 0
         self.serv_hits = 0
         if off_path_hits:
             self.off_path_hit_count = 0
@@ -396,6 +428,10 @@ class CacheHitRatioCollector(DataCollector):
             self.per_node_cache_hits[node] += 1
 
     @inheritdoc(DataCollector)
+    def locator_hit(self, node):
+        self.locator_hits += 1
+
+    @inheritdoc(DataCollector)
     def server_hit(self, node):
         self.serv_hits += 1
         if self.cont_hits:
@@ -408,6 +444,7 @@ class CacheHitRatioCollector(DataCollector):
         n_sess = self.cache_hits + self.serv_hits
         hit_ratio = self.cache_hits / n_sess
         results = Tree(**{'MEAN': hit_ratio})
+        results['LOCATOR_HITS'] = self.locator_hits/self.sess_count
         if self.off_path_hits:
             results['MEAN_OFF_PATH'] = self.off_path_hit_count / n_sess
             results['MEAN_ON_PATH'] = results['MEAN'] - results['MEAN_OFF_PATH']

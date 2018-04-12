@@ -244,7 +244,37 @@ def run_scenario(settings, params, curr_exp, n_exp):
             # the whole network
             cachepl_spec['cache_budget'] = workload.n_contents * network_cache
             CACHE_PLACEMENT[cachepl_name](topology, **cachepl_spec)
+            
+            if 'rsn_placement' in tree:
+                rsnpl_spec = tree['rsn_placement']
+                rsnpl_name = rsnpl_spec.pop('name')
+                if rsnpl_name not in RSN_PLACEMENT:
+                    logger.error('No RSN placement named %s was found.' % rsnpl_name)
+                    return None
+                network_rsn = rsnpl_spec.pop('network_rsn')
+                rsnpl_spec['rsn_budget'] = workload.n_contents * network_rsn
+                if 'rsn_cache_ratio' not in params['rsn_placement']:
+                    params['rsn_placement']['rsn_cache_ratio'] =  network_rsn/network_cache
+                RSN_PLACEMENT[rsnpl_name](topology, **rsnpl_spec)
         
+        if 'joint_cache_rsn_placement' in tree:
+            cache_rsn_spec = tree['joint_cache_rsn_placement']
+            cache_rsn_name = cache_rsn_spec.pop('name')
+            if cache_rsn_name not in JOINT_CACHE_RSN_PLACEMENT:
+                logger.error('No joint cache/RSN placement named %s was found.' % cache_rsn_name)
+                return None
+            if 'cache_placement' in tree or 'rsn_placement' in tree:
+                logger.error('You cannot set a joint RSN-cache placement strategy '
+                             'and separate cache and RSN deployment strategies together')
+                return None
+            network_cache = cache_rsn_spec.pop('network_cache')
+            cache_rsn_spec['cache_budget'] = workload.n_contents * network_cache
+            network_rsn = cache_rsn_spec.pop('network_rsn')
+            cache_rsn_spec['rsn_budget'] = workload.n_contents * network_rsn
+            JOINT_CACHE_RSN_PLACEMENT[cache_rsn_name](topology, **cache_rsn_spec)
+            if 'rsn_cache_ratio' not in params['joint_cache_rsn_placement']:
+                params['joint_cache_rsn_placement']['rsn_cache_ratio'] = network_rsn/network_cache
+
         # Assign contents to sources
         # If there are many contents, after doing this, performing operations
         # requiring a topology deep copy, i.e. to_directed/undirected, will

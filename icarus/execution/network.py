@@ -103,6 +103,23 @@ class NetworkView(object):
         """
         return self.model.rs_source.get(k, None)
 
+    def closest_rs_source(self, k, node):
+        """Return the closest route service node
+        """
+        rs_locations = self.model.rs_source.get(k, None)
+        
+        if rs_locations is None:
+            raise ValueError('There must be at least one Route Service, but there are none.')
+        min_distance = 1000
+        closest_rs = None
+        for loc in rs_locations:
+            path = self.shortest_path[node][loc]
+            if len(path) < min_distance:
+                min_distance = len(path)
+                closest_rs = loc
+
+        return closest_rs
+
     def content_source(self, k):
         """Return the node identifier where the content is persistently stored.
 
@@ -755,7 +772,7 @@ class NetworkController(object):
         if node in self.model.cache:
             return self.model.cache[node].remove(self.session['content'])
 
-    def put_rsn(self, node, next_hop, content=None):
+    def put_rsn(self, node, locator, content=None):
         """Store forwarding information in the Recently Served Name (RSN) table
         of the specified node.
         
@@ -768,8 +785,8 @@ class NetworkController(object):
         ----------
         node : any hashable type
             The node where the entry is inserted
-        next_hop : any hashable type
-            The node towards which the content is forwarded
+        locator : any hashable type
+            The locator to cache
         content : any hashable type
             The content identifier to insert in the entry. If not specified
             the content being transferred in the session is used
@@ -781,7 +798,7 @@ class NetworkController(object):
         """
         if node in self.model.rsn:
             content = self.session['content'] if content is None else content
-            return self.model.rsn[node].put(content, next_hop)
+            return self.model.rsn[node].put(content, locator)
 
     def get_rsn(self, node, content=None):
         """Get an RSN entry of the content being handled from a given node.
@@ -795,14 +812,21 @@ class NetworkController(object):
             
         Returns
         -------
-        next_hop : any hashable type
-            The node towards which the content was forwarded, if in the RSN,
+        locator : any hashable type
+            The node towards which the content is to be forwarded, if in the RSN,
             otherwise *None*
         """
         if node in self.model.rsn:
             content = self.session['content'] if content is None else content
-            return self.model.rsn[node].get(content)
-
+            locator = self.model.rsn[node].get(content)
+            if locator is not None: #cache hit
+                if self.session['log']:
+                    self.collector.locator_hit(node)
+                return locator
+            else:
+                if self.session['log']:
+                    self.collector.locator_miss(node)
+                return None
         return None
 
     def remove_rsn(self, node, content=None):

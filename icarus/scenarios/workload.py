@@ -35,17 +35,23 @@ __all__ = [
 
 @register_workload('TRANSIT_LOCAL')
 class TransitLocalWorkload(object):
-    """This function generates transit and local traffic according to given percentages and content popularity"""
+    """
+    This function generates transit and local traffic according to given percentages and content popularity.
+    The following traffic patterns are generated:
+    transit traffic: traffic that transits through the domain.
+    local traffic: both end-points of the traffic is within the domain.
+    ingress traffic: consumer is outside and the producer is inside the domain.
+    egress traffic: consumer is inside and the producer is outside the domain.
+    """
 
     def __init__(self, topology, n_contents, alpha, beta=0, rate=1.0,
-                    n_warmup=10 ** 5, n_measured=4 * 10 ** 5, seed=None, **kwargs):
+                    n_warmup=10 ** 5, n_measured=4 * 10 ** 5, seed=None, transit=0.7, local=0.1, ingress=0.1, egress=0.1, **kwargs):
         if alpha < 0:
             raise ValueError('alpha must be positive')
         if beta < 0:
             raise ValueError('beta must be positive')
         self.receivers = [v for v in topology.nodes_iter()
                      if topology.node[v]['stack'][0] == 'receiver']
-        self.zipf = TruncatedZipfDist(alpha, n_contents)
         self.n_contents = n_contents
         self.contents = range(1, n_contents + 1)
         self.alpha = alpha
@@ -54,6 +60,16 @@ class TransitLocalWorkload(object):
         self.n_measured = n_measured
         random.seed(seed)
         self.beta = beta
+        self.local = local
+        self.transit = transit
+        self.ingress = ingress
+        self.egress = egress
+        self.local_contents = list(topology.graph['internal_contents'])
+        self.remote_contents = list(topology.graph['edge_contents'])
+        self.local_receivers = topology.graph['internal_receivers']
+        self.remote_receivers = topology.graph['edge_receivers']
+        self.zipf_local = TruncatedZipfDist(alpha, len(self.local_contents))
+        self.zipf_remote = TruncatedZipfDist(alpha, len(self.transit_contents))
         if beta != 0:
             degree = nx.degree(self.topology)
             self.receivers = sorted(self.receivers, key=lambda x: degree[iter(topology.edge[x]).next()], reverse=True)
@@ -64,11 +80,34 @@ class TransitLocalWorkload(object):
         t_event = 0.0
         while req_counter < self.n_warmup + self.n_measured:
             t_event += (random.expovariate(self.rate))
-            if self.beta == 0:
-                receiver = random.choice(self.receivers)
+            x = random.random()
+            content = -1
+            receiver = -1
+            if x < self.transit:
+                # transit traffic
+                receiver = random.choice(self.remote_receivers)
+                indx = int(self.zipf_remote.rv())
+                content = self.remote_contents[indx]
+            elif x < self.transit + self.local:
+                # local traffic
+                receiver = random.choice(self.local_receivers)
+                indx = int(self.zipf_local.rv())
+                content = self.local_contents[indx]
+            elif x < self.transit + self.local + self.ingress:
+                # ingress traffic
+                receiver = random.choice(self.remote_receivers)
+                indx = int(self.zipf_local.rv())
+                content = self.local_contents[indx]
             else:
-                receiver = self.receivers[self.receiver_dist.rv() - 1]
-            content = int(self.zipf.rv())
+                # egress traffic
+                receiver = random.choice(self.local_receivers)
+                indx = int(self.zipf_remote.rv())
+                content = self.remote_contents[indx]
+            #if self.beta == 0:
+            #    receiver = random.choice(self.receivers)
+            #else:
+            #    receiver = self.receivers[self.receiver_dist.rv() - 1]
+            #content = int(self.zipf.rv())
             log = (req_counter >= self.n_warmup)
             event = {'receiver': receiver, 'content': content, 'log': log}
             yield (t_event, event)
