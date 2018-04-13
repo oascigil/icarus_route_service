@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """Orchestrate the execution of all experiments.
 
 The orchestrator is responsible for scheduling experiments specified in the

@@ -645,6 +645,11 @@ link_consistency	models/cache/tests/test_policies.py	/^    def link_consistency(
 link_delay	execution/network.py	/^    def link_delay(self, u, v):$/;"	m	class:NetworkView
 link_type	execution/network.py	/^    def link_type(self, u, v):$/;"	m	class:NetworkView
 local_cache_lookup	execution/network.py	/^    def local_cache_lookup(self, node, content):$/;"	m	class:NetworkView
+locator_hit	execution/collectors.py	/^    def locator_hit(self, node):$/;"	m	class:CacheHitRatioCollector
+locator_hit	execution/collectors.py	/^    def locator_hit(self, node):$/;"	m	class:CollectorProxy
+locator_hit	execution/collectors.py	/^    def locator_hit(self, node):$/;"	m	class:DataCollector
+locator_miss	execution/collectors.py	/^    def locator_miss(self, node):$/;"	m	class:CollectorProxy
+locator_miss	execution/collectors.py	/^    def locator_miss(self, node):$/;"	m	class:DataCollector
 log_likelihood	tools/traces.py	/^    def log_likelihood(alpha):$/;"	f	function:zipf_fit
 logger	execution/network.py	/^logger = logging.getLogger('orchestration')$/;"	v
 logger	orchestration.py	/^logger = logging.getLogger('orchestration')$/;"	v

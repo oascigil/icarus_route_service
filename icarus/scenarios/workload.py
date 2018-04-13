@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """Traffic workloads
 
 Every traffic workload to be used with Icarus must be modelled as an iterable

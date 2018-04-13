@@ -99,12 +99,12 @@ default['joint_cache_rsn_placement']['network_rsn'] = 100*NETWORK_CACHE
 
 for joint_cache_rsn_placement in ['CACHE_ALL_RSN_ALL']:
     for rsn_cache_ratio in [32.0, 64.0, 128.0, 256.0]:
-        for strategy in ['FORWARD_TO_RS'] #, 'STOP_AND_WAIT', 'SEARCH_NEARBY']:
+        for strategy in ['FORWARD_TO_RS']: #, 'STOP_AND_WAIT', 'SEARCH_NEARBY']:
             experiment = copy.deepcopy(default)
             experiment['warmup_strategy']['name'] = strategy
             experiment['strategy']['name'] = strategy
             experiment['joint_cache_rsn_placement']['name'] = joint_cache_rsn_placement
-            experiment['joint_cache_rsn_placement']['network_rsn'] = rsn_cache_ratio * network_cache
+            experiment['joint_cache_rsn_placement']['network_rsn'] = rsn_cache_ratio * NETWORK_CACHE
             experiment['joint_cache_rsn_placement']['rsn_cache_ratio'] = rsn_cache_ratio
             experiment['desc'] = "RSN size sensitivity -> RSN/cache ratio: %s" % str(rsn_cache_ratio)
             EXPERIMENT_QUEUE.append(experiment)

@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """Performance metrics loggers
 
 This module contains all data collectors that record events while simulations

@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """Cache replacement policies implementations
 
 This module contains the implementations of all the cache replacement policies
