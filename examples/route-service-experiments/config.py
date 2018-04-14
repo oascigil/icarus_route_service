@@ -79,6 +79,7 @@ default['workload'] = {'name':       'TRANSIT_LOCAL',
                        'local':      0.1,
                        'ingress':    0.1,
                        'egress':     0.1,
+                       'alpha' :     ALPHA
                        }
 #default['cache_placement']['name'] = 'UNIFORM'
 default['content_placement']['name'] = 'TRANSIT_LOCAL'

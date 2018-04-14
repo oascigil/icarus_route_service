@@ -6,7 +6,10 @@ import os
 import collections
 
 import numpy as np
-import matplotlib
+#import matplotlib
+#import matplotlib.pyplot as plt
+import matplotlib as mpl
+mpl.use('Agg')
 import matplotlib.pyplot as plt
 
 from icarus.util import Tree, step_cdf

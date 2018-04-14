@@ -15,6 +15,12 @@ CACHE_PLACEMENT = {}
 # Dictionary storying all content placement functions keyed by ID
 CONTENT_PLACEMENT = {}
 
+# Dictionary storying all RSN placement functions keyed by ID
+RSN_PLACEMENT = {}
+
+# Dictionary storying all joint cache/RSN placement functions keyed by ID
+JOINT_CACHE_RSN_PLACEMENT = {}
+
 # Dictionary storying all content placement functions keyed by ID
 ROUTE_SERVICE_PLACEMENT = {}
 
@@ -64,6 +70,8 @@ register_cache_policy = register_decorator(CACHE_POLICY)
 register_strategy = register_decorator(STRATEGY)
 register_topology_factory = register_decorator(TOPOLOGY_FACTORY)
 register_cache_placement = register_decorator(CACHE_PLACEMENT)
+register_rsn_placement = register_decorator(RSN_PLACEMENT)
+register_joint_cache_rsn_placement = register_decorator(JOINT_CACHE_RSN_PLACEMENT)
 register_route_service_placement = register_decorator(ROUTE_SERVICE_PLACEMENT)
 register_content_placement = register_decorator(CONTENT_PLACEMENT)
 register_workload = register_decorator(WORKLOAD)

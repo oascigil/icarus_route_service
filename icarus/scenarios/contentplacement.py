@@ -68,9 +68,9 @@ def transit_local_content_placement(topology, contents, percentage_local=0.2, pe
     random.seed(seed)
     n_contents = len(contents)
     n_internal_nodes = n_contents*percentage_local
-    n_edge_nodes = n_contents - n_local
-    internal_sources = topology.graph['internal_sources']
-    edge_sources = topology.graph['edge_sources']
+    n_edge_nodes = n_contents - n_internal_nodes
+    internal_sources = list(topology.graph['internal_sources'])
+    edge_sources = list(topology.graph['edge_sources'])
 
     content_placement = collections.defaultdict(set)
     edge_contents = []
@@ -81,7 +81,7 @@ def transit_local_content_placement(topology, contents, percentage_local=0.2, pe
             internal_contents.append(c)
             n_internal_nodes -= 1
         if n_edge_nodes > 0:
-            content_placement[random_choice(edge_sources)].add(c)
+            content_placement[random.choice(edge_sources)].add(c)
             edge_contents.append(c)
             n_edge_nodes -= 1
 

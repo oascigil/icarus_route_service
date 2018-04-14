@@ -2,6 +2,7 @@
 """
 from icarus.scenarios.algorithms import *
 from .cacheplacement import *
+from .rsnplacement import *
 from .contentplacement import *
 from .topology import *
 from .workload import *

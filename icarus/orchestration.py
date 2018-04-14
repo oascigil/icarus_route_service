@@ -16,7 +16,7 @@ import traceback
 
 from icarus.execution import exec_experiment
 from icarus.registry import TOPOLOGY_FACTORY, CACHE_PLACEMENT, CONTENT_PLACEMENT, \
-                            ROUTE_SERVICE_PLACEMENT, CACHE_POLICY, WORKLOAD, DATA_COLLECTOR, STRATEGY
+                            JOINT_CACHE_RSN_PLACEMENT, RSN_PLACEMENT, ROUTE_SERVICE_PLACEMENT, CACHE_POLICY, WORKLOAD, DATA_COLLECTOR, STRATEGY
 from icarus.results import ResultSet
 from icarus.util import SequenceNumber, timestr
 

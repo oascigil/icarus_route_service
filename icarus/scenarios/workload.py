@@ -46,7 +46,7 @@ class TransitLocalWorkload(object):
     """
 
     def __init__(self, topology, n_contents, alpha, beta=0, rate=1.0,
-                    n_warmup=10 ** 5, n_measured=4 * 10 ** 5, seed=None, transit=0.7, local=0.1, ingress=0.1, egress=0.1, **kwargs):
+                    n_warmup=10 ** 5, n_measured=4 * 10 ** 5, transit=0.7, local=0.1, ingress=0.1, egress=0.1, seed=None, **kwargs):
         if alpha < 0:
             raise ValueError('alpha must be positive')
         if beta < 0:
@@ -65,18 +65,18 @@ class TransitLocalWorkload(object):
         self.transit = transit
         self.ingress = ingress
         self.egress = egress
-        self.local_contents = list(topology.graph['internal_contents'])
-        self.remote_contents = list(topology.graph['edge_contents'])
-        self.local_receivers = topology.graph['internal_receivers']
-        self.remote_receivers = topology.graph['edge_receivers']
-        self.zipf_local = TruncatedZipfDist(alpha, len(self.local_contents))
-        self.zipf_remote = TruncatedZipfDist(alpha, len(self.transit_contents))
         if beta != 0:
             degree = nx.degree(self.topology)
             self.receivers = sorted(self.receivers, key=lambda x: degree[iter(topology.edge[x]).next()], reverse=True)
             self.receiver_dist = TruncatedZipfDist(beta, len(self.receivers))
     
     def __iter__(self):
+        self.local_contents = list(topology.graph['internal_contents'])
+        self.remote_contents = list(topology.graph['edge_contents'])
+        self.local_receivers = topology.graph['internal_receivers']
+        self.remote_receivers = topology.graph['edge_receivers']
+        self.zipf_local = TruncatedZipfDist(alpha, len(self.local_contents))
+        self.zipf_remote = TruncatedZipfDist(alpha, len(self.transit_contents))
         req_counter = 0
         t_event = 0.0
         while req_counter < self.n_warmup + self.n_measured:
